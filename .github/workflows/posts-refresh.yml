@@ -42,7 +42,14 @@ jobs:
       - name: Commit
         if: ${{ steps.get-posts.outputs.urls_added > 0 }}
         run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
           git add src/data/posts.json
           git commit -m "Refresh posts"
-          git push
+      - name: Push changes
+        if: ${{ steps.get-posts.outputs.urls_added > 0 }}
+        uses: ad-m/github-push-action@master
+        with:
+          branch: ${{ github.ref }}
+
 
