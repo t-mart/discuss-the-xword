@@ -1,5 +1,5 @@
 import re
-from collections import defaultdict
+import sys
 import json
 from pathlib import Path
 from typing import Optional
@@ -87,29 +87,27 @@ def get_posts(
     crossword_subreddit = reddit.subreddit("crossword")
 
     if dbpath.exists():
+        print(f"Opening existing db file from {str(dbpath)}", file=sys.stderr)
         with dbpath.open("r") as dbfile:
-            # db: dict[int, dict[int, dict[int, str]]] = json.load(dbfile)
             db: dict[str, dict[str, dict[str, str]]] = json.load(dbfile)
         latest_year = max(db.keys(), key=int)
         latest_month = max(db[latest_year], key=int)
         latest_day = max(db[latest_year][latest_month], key=int)
-        start_date = arrow.get(int(latest_year), int(latest_month), int(latest_day)).shift(days=+1)
+        start_date = arrow.get(
+            int(latest_year), int(latest_month), int(latest_day)
+        ).shift(days=+1)
     else:
-        # db = defaultdict(lambda: defaultdict(dict))
+        print(f"Creating new db file at {str(dbpath)}", file=sys.stderr)
         db = {}
         start_date = FIRST_KNOWN_DISCUSSION_POST_DATE
 
-    # submissions_by_date: dict[int, dict[int, dict[int, str]]] = defaultdict(
-    #     lambda: defaultdict(dict)
-    # )
     # search up through tomorrow because NYT publishes tomorrow's crossword at 6P EST today
     tomorrow = arrow.utcnow().shift(days=+1).floor("day")
 
+    records_added = 0
+
     for search_date in arrow.Arrow.range("day", start_date, tomorrow):
-        year = search_date.year
-        month = search_date.month
-        day = search_date.day
-        ymd_path = f'{year}.{month}.{day}'
+        ymd_path = f"{search_date.year}.{search_date.month}.{search_date.day}"
 
         if skip_existing_url and glom.glom(db, ymd_path, default=None) != None:
             continue
@@ -129,48 +127,22 @@ def get_posts(
                 continue
 
             glom.assign(db, ymd_path, post.url, missing=dict)
-            print(f'Found post for {search_date.format("YYYY-MM-DD")}')
+            records_added += 1
+            print(f'Found post for {search_date.format("YYYY-MM-DD")}', file=sys.stderr)
             break
         else:
-            print(f'Could not find post for {search_date.format("YYYY-MM-DD")}')
+            print(
+                f'Could not find post for {search_date.format("YYYY-MM-DD")}',
+                file=sys.stderr,
+            )
 
-    with dbpath.open('w') as dbfile:
-        json.dump(db, dbfile, indent=2)
+    if records_added > 0:
+        print(f"Writing db to {str(dbpath)}", file=sys.stderr)
+        with dbpath.open("w") as dbfile:
+            json.dump(db, dbfile, indent=2)
+
+    print(records_added)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     get_posts()
-# reddit = praw.Reddit(
-#     client_id="kmr1C_HjuwzucTHMgY5aWQ",
-#     client_secret="q4pZrzEqD8WQ-_aBld8vz4QLLIwbGw",
-#     refresh_token="93742048606-7pGZNZGzOEj6aib-L9I7uljqvGNGZA",
-#     user_agent="praw on behalf of u/automatic-happiness for crossword script",
-# )
-
-
-# search_range_end = (
-#     arrow.utcnow().floor("day").shift(days=+1)
-# )  # in case tomorrow's has been released
-# search_range_start = search_range_end.shift(years=-2)
-
-# for search_date in reversed(
-#     list(arrow.Arrow.range("day", search_range_start, search_range_end))
-# ):
-#     if search_date.format("YYYY-MM-DD") in submissions_by_date:
-#         continue
-#     search_query = f"NYT {search_date.format('MM/DD/YYYY')} Discussion"
-#     print(f"Looking for {search_query} post...")
-#     for submission in crossword_subreddit.search(search_query, limit=100):
-#         if match := DISCUSSION_POST_TITLE_PATTERN.search(submission.title):
-#             post_date = arrow.get(match.group(1), "MM/DD/YYYY")
-#             if search_date == post_date and submission.author.name == "AutoModerator":
-#                 year = post_date.year
-#                 month = post_date.month
-#                 day = post_date.day
-#                 submissions_by_date[year][month][day] = submission.url
-#                 with Path("posts.json").open("w") as posts_file:
-#                     json.dump(submissions_by_date, posts_file, indent=2)
-#                 print(f"\tFound post {search_date}")
-#                 break
-#     else:
-#         print("\tCould not find post!")

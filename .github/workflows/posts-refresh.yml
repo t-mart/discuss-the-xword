@@ -1,0 +1,48 @@
+name: Posts Refresh
+
+on:
+  schedule:
+    - cron:  '0 4 * * *'
+  workflow_dispatch:
+
+jobs:
+  posts-refresh:
+    name: Posts Refresh
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Setup Python 3.9
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+      - name: Get pip cache dir
+        id: get-pip-cache-dir
+        run: |
+          echo "::set-output name=dir::$(pip cache dir)"
+        shell: bash
+      - name: Cache PyPI
+        uses: actions/cache@v2
+        with:
+          key: dep-cache-pip-${{ hashFiles('get_posts/requirements.txt') }}
+          path: ${{ steps.get-pip-cache-dir.outputs.dir }}
+      - name: Install dependencies
+        run: |
+          pip install pip-tools==6.2.0
+          pip-sync get_posts/requirements.txt
+      - name: Get the posts
+        id: get-posts
+        env:
+          REDDIT_USERNAME: ${{ secrets.REDDIT_USERNAME }}
+          REDDIT_PASSWORD: ${{ secrets.REDDIT_PASSWORD }}
+          REDDIT_CLIENT_ID: ${{ secrets.REDDIT_CLIENT_ID }}
+          REDDIT_CLIENT_SECRET: ${{ secrets.REDDIT_CLIENT_SECRET }}
+        run: |
+          echo "::set-output name=urls_added::$(python get_posts/get_posts.py --dbpath src/data/posts.json)"
+      - name: Commit
+        if: ${{ steps.get-posts.outputs.urls_added > 0 }}
+        run: |
+          git add src/data/posts.json
+          git commit -m "Refresh posts"
+          git push
+
