@@ -2,8 +2,8 @@ export function About() {
   return (
     <div class="max-w-prose space-y-4 mx-auto">
       <p>
-        Each day on the <a class="underline text-gray-500 hover:text-black" href="https://www.reddit.com/r/crossword/">r/crossword/</a> subreddit,
-        there's a new post that discusses <a class="underline text-gray-500 hover:text-black" href="https://www.nytimes.com/crosswords/game/daily">today's
+        Each day on the <a class="underline hover:text-gray-600" href="https://www.reddit.com/r/crossword/">r/crossword/</a> subreddit,
+        there's a new post that discusses <a class="underline hover:text-gray-600" href="https://www.nytimes.com/crosswords/game/daily">today's
         New York Times crossword puzzle</a>. These posts provide a place for fellow
         solvers to praise (or criticize!) the puzzle, ask others for help, vote on puzzle difficulty, etc.
         They're a great way to conclude your solve and get feedback.
@@ -17,13 +17,14 @@ export function About() {
 
       <p>
         <b>Trouble is, it's difficult to find those posts on Reddit when they're
-        in the past.</b> Reddit sorts posts by time or popularity, so an old post can easily get buried
-        under others. Searching can help, but you have to properly format search query to the date format,
-        and even then, you're not guaranteed to find it because these posts haven't been made for that long.
+        in the past.</b> Reddit sorts posts by time or popularity and doesn't let you easily navigate
+        to old posts, so you may be scrolling down for quite a while. Searching can help, but you have to
+        properly format search query to the date format, and even then, you're not guaranteed to find it
+        because these posts haven't been made for that long.
       </p>
 
       <p>
-        Point being, that all sucks, so I created this website to let you easily find the discussion post
+        So all that sucks, so I created this website to let you easily find the discussion post
         for a particular date's puzzle (or realize that it doesn't exist).
       </p>
     </div>

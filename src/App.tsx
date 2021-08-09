@@ -1,15 +1,21 @@
-import { BrowserRouter, Route, Link, Switch, Redirect } from "react-router-dom";
+import { BrowserRouter, Route, Switch, Redirect } from "react-router-dom";
+import maxBy from "lodash/maxBy";
+
 import { About } from "./About";
 import { Footer } from "./Footer";
-
 import { Header } from './Header';
 import { Index } from './Index';
-import { buildContextValue, PostDataContext } from './PostDataContext';
+import { PostsContext } from './PostsContext';
+import { Posts } from './Posts';
+
+import postData from "./data/posts.json";
 
 export function App() {
-  const postDataContextValue = buildContextValue()
 
-  const latestMonthOneBased = String(Number(postDataContextValue.latestMonth) + 1).padStart(2, "0");
+  const posts: Posts = postData;
+
+  const latestYear = maxBy(Object.keys(posts), Number)!
+  const latestMonth = maxBy(Object.keys(posts[latestYear]), Number)!
 
   return (
     <BrowserRouter>
@@ -20,12 +26,12 @@ export function App() {
             <About />
           </Route>
           <Route path="/posts/:year/:month">
-            <PostDataContext.Provider value={postDataContextValue}>
+            <PostsContext.Provider value={posts}>
               <Index />
-            </PostDataContext.Provider>
+            </PostsContext.Provider>
           </Route>
           <Route path="/">
-            <Redirect to={`/posts/${postDataContextValue.latestYear}/${latestMonthOneBased}`} />
+            <Redirect to={`/posts/${latestYear}/${latestMonth}`} />
           </Route>
         </Switch>
         <Footer />

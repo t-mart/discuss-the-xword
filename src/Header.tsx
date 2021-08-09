@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 
-import LogoPath from './logo.svg'
+import LogoPath from './images/logo.svg'
 
 export function Header() {
   return (

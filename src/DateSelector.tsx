@@ -4,32 +4,30 @@ import { useContext } from 'preact/hooks';
 import { useHistory, useParams } from "react-router-dom";
 
 import { IndexRouteParams } from './IndexRouteParams';
-import { PostDataContext } from './PostDataContext'
+import { PostsContext } from './PostsContext'
 
 
 export function DateSelector() {
   const params = useParams<IndexRouteParams>();
 
-  const monthStr = params.month;  // one-based indexing, will be zero padded to two digits
-  const monthNum = Number(monthStr) - 1 // zero-based indexing
-  const yearStr = params.year;
-  const yearNum = Number(yearStr);
+  const month = params.month;
+  const year = params.year;
 
-  const { postsGroupedByYearMonth } = useContext(PostDataContext);
+  const posts = useContext(PostsContext);
 
   const history = useHistory();
 
-  const availableMonths = Object.keys(postsGroupedByYearMonth[yearNum]);
-  const availableYears = Object.keys(postsGroupedByYearMonth);
+  const availableYears = Object.keys(posts);
+  const availableMonths = Object.keys(posts[year]);
 
   const referenceDate = dayjs().date(1) // set to the first, which every month has
 
-  const monthOptions = range(12).map((monthIdx) => (
+  const monthOptions = range(1, 12 + 1).map((monthIdx) => (
     <option
       value={String(monthIdx)}
       disabled={!availableMonths.includes(String(monthIdx))}
     >
-      {referenceDate.month(monthIdx).format("MMMM")}
+      {referenceDate.month(monthIdx - 1).format("MMMM")}
     </option>
   ));
   const yearOptions = availableYears.map((year) => (
@@ -42,33 +40,32 @@ export function DateSelector() {
 
   const handleYearChange = (e: Event) => {
     if (e.target instanceof HTMLSelectElement) {
-      const newYearStr = e.target!.value;
-      const newYearNum = Number(newYearStr);
+      const newYear = e.target!.value;
 
-      let newMonthStr = monthStr;
+      let newMonth = month;
 
-      const monthIdxsInYear = Object.keys(postsGroupedByYearMonth[newYearNum]).map(Number);
-      if (!monthIdxsInYear.includes(monthNum)) {
-        newMonthStr = String(monthIdxsInYear[0] + 1).padStart(2, "0");
+      const monthsInNewYear = Object.keys(posts[newYear]);
+      if (!monthsInNewYear.includes(newMonth)) {
+        newMonth = monthsInNewYear[0];
       }
 
-      history.push(`/posts/${newYearStr}/${newMonthStr}`)
+      history.push(`/posts/${newYear}/${newMonth}`)
     };
   }
 
   const handleMonthChange = (e: Event) => {
     if (e.target instanceof HTMLSelectElement) {
-      const newMonthStr = String(Number(e.target!.value) + 1).padStart(2, "0");
-      history.push(`/posts/${yearStr}/${newMonthStr}`)
+      const newMonth = e.target!.value
+      history.push(`/posts/${year}/${newMonth}`)
     }
   }
 
   return (
     <div class="flex justify-center space-x-4">
-      <select class="form-select" value={String(monthNum)} onChange={handleMonthChange}>
+      <select class="form-select" value={month} onChange={handleMonthChange}>
         {monthOptions}
       </select>
-      <select class="form-select" value={yearStr} onChange={handleYearChange}>
+      <select class="form-select" value={year} onChange={handleYearChange}>
         {yearOptions}
       </select>
     </div>
