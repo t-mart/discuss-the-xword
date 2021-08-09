@@ -1,4 +1,4 @@
-import { BrowserRouter, Route, Switch, Redirect } from "react-router-dom";
+import { HashRouter, Route, Switch, Redirect } from "react-router-dom";
 import maxBy from "lodash/maxBy";
 
 import { About } from "./About";
@@ -18,7 +18,7 @@ export function App() {
   const latestMonth = maxBy(Object.keys(posts[latestYear]), Number)!
 
   return (
-    <BrowserRouter>
+    <HashRouter>
       <div class="container max-w-screen-md px-4 space-y-8 my-8">
         <Header />
         <Switch>
@@ -36,6 +36,6 @@ export function App() {
         </Switch>
         <Footer />
       </div>
-    </BrowserRouter>
+    </HashRouter>
   )
 }
