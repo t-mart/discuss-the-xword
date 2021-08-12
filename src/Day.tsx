@@ -44,7 +44,7 @@ export function Day(props: Props) {
   // wrap with link if there is one one post object
   if (url) {
     content = (
-      <a href={url} class="hover:underline group">
+      <a href={url} class="hover:underline group" target="_blank">
         {content}
       </a>
     )
