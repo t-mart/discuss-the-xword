@@ -39,7 +39,7 @@ export function About() {
         You can view the source code for this website at <a
         class="underline hover:text-gray-500"
         href="https://github.com/t-mart/discuss-the-xword"
-        target="_blank">https://github.com/t-mart/discuss-the-xword</a>
+        target="_blank">https://github.com/t-mart/discuss-the-xword</a>.
       </p>
     </div>
   )
