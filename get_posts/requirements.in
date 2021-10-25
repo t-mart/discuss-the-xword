@@ -1,4 +1,4 @@
 praw==7.4.0
-arrow==1.1.1
-click==8.0.1
+arrow==1.2.1
+click==8.0.3
 glom==20.11.0

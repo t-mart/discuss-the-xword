@@ -12,10 +12,10 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-      - name: Setup Python 3.9
+      - name: Setup Python 3.10
         uses: actions/setup-python@v2
         with:
-          python-version: 3.9
+          python-version: "3.10"
       - name: Get pip cache dir
         id: get-pip-cache-dir
         run: |
@@ -28,7 +28,7 @@ jobs:
           path: ${{ steps.get-pip-cache-dir.outputs.dir }}
       - name: Install dependencies
         run: |
-          pip install pip-tools==6.2.0
+          pip install pip-tools==6.4.0
           pip-sync get_posts/requirements.txt
       - name: Get the posts
         id: get-posts
